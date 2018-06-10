@@ -52,6 +52,8 @@ namespace KafkaTestClient
             return nullptr;
         }
 
+        virtual ~Envelope() = default;
+
     private:
         std::shared_ptr<RdKafka::Message> message;
         std::string routingKey;

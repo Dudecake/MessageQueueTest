@@ -6,9 +6,12 @@
 #define MESSAGEQUEUETEST_PROGRAM_H
 
 #include <QObject>
+#include <include/rabbitmqclient/receivingqueue.h>
+#include "minicsv.h"
 
-#ifdef RABBIT
+#ifdef RABBITMQ
 #include "rabbitmqclient/topic.h"
+#include "rabbitmqclient/envelope.h"
 
 namespace messageQueueProvider = RabbitMQTestClient;
 #elif ACTIVEMQ
@@ -26,9 +29,18 @@ class Program : public QObject
     Q_OBJECT
 public:
     explicit Program(QObject *parent = nullptr);
+    virtual ~Program();
 
 private:
+    static int64_t messageCount;
     messageQueueProvider::Topic r;
+#ifdef RABBITMQ
+    messageQueueProvider::ReceivingQueue queue;
+#endif
+    mini::csv::ostringstream csvMessOut;
+    mini::csv::ostringstream csvMessIn;
+    std::chrono::time_point<std::chrono::high_resolution_clock> inMessInterval;
+    int64_t inMessId;
 public slots:
     void run();
     void handleMessage(messageQueueProvider::Envelope envelope);

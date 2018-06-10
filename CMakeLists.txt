@@ -32,7 +32,7 @@ endif ()
 
 set(SRC src/main.cpp src/program.cpp)
 
-set(HEADERS "" include/program.h include/baseenvelope.h)
+set(HEADERS "" include/program.h include/minicsv.h include/baseenvelope.h)
 add_executable(${PROJECT_NAME} ${SRC} ${HEADERS} ${AMQP_PROVIDER_SRC} ${AMQP_PROVIDER_HEADERS})
 
 set(CMAKE_CXX_STANDARD 14)

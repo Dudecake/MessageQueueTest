@@ -53,6 +53,8 @@ namespace ActiveMQTestClient
             return std::string();
         }
 
+        virtual ~Envelope() = default;
+
     private:
         std::shared_ptr<const cms::Message> message;
         std::string routingKey;

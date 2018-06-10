@@ -94,9 +94,9 @@ namespace RabbitMQTestClient
          * @brief getDeliveryChannel
          * @return the delivery channe;
          */
-        virtual unsigned short getDeliveryChannel() const override
+        virtual std::string getDeliveryChannel() const override
         {
-            return amqpEnvelope->DeliveryChannel();
+            return std::to_string(amqpEnvelope->DeliveryChannel());
         }
 
     private:

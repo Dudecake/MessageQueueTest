@@ -39,6 +39,8 @@ public:
 
     virtual std::string getDeliveryChannel() const = 0;
 
+    virtual ~BaseEnvelope() = default;
+
 protected:
     BaseEnvelope() = default;
 };
