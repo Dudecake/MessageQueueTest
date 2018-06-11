@@ -5,10 +5,14 @@
 #include <QCoreApplication>
 #include <thread>
 #include <ostream>
+#include <ctime>
+#include <iomanip>
 #include "program.h"
+
 #ifdef ACTIVEMQ
 #include <cms/BytesMessage.h>
 #endif
+#define CSVNAME(name, provider) name << #provider << ".csv"
 
 int64_t Program::messageCount = 1000;
 
@@ -27,6 +31,10 @@ Program::Program(QObject *parent) :
 #else
     connect(&r, &messageQueueProvider::Topic::messageReceived, this, &Program::handleMessage, Qt::QueuedConnection);
 #endif
+    std::time_t startTime = std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now());
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&startTime), "%F_%Y");
+    dateString = ss.str();
     csvMessOut.set_delimiter(';', std::string());
     csvMessIn.set_delimiter(';', std::string());
     csvMessOut << "messId" << "sendTime (ms)" << NEWLINE;
@@ -51,7 +59,9 @@ void Program::run()
         csvMessOut << i << duration<double, std::milli>(high_resolution_clock::now() - messStart).count() << NEWLINE;
     }
     qDebug() << "Sent messages in" << duration<double, std::milli>(high_resolution_clock::now() - start).count() << "ns";
-    std::ofstream csvFile("messageOut.csv", std::ios_base::trunc);
+    std::stringstream ss;
+    ss << CSVNAME("messageOut-" + dateString, AMQP_PROVIDER);
+    std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessOut.get_text();
 }
 
@@ -82,6 +92,8 @@ void Program::handleMessage(messageQueueProvider::Envelope envelope)
 
 Program::~Program()
 {
-    std::ofstream csvFile("messageIn.csv", std::ios_base::trunc);
+    std::stringstream ss;
+    ss << CSVNAME("messageIn-" + dateString, AMQP_PROVIDER);
+    std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessIn.get_text();
 }

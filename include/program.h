@@ -41,6 +41,7 @@ private:
     mini::csv::ostringstream csvMessIn;
     std::chrono::time_point<std::chrono::high_resolution_clock> inMessInterval;
     int64_t inMessId;
+    std::string dateString;
 public slots:
     void run();
     void handleMessage(messageQueueProvider::Envelope envelope);

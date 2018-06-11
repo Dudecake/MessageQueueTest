@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
 #elif KAFKA
     KafkaTestClient::KafkaClient::initClient(QUrl("tcp://localhost:9092"));
 #endif
-    std::cout << "Hello, World!" << std::endl;
 
     Program p;
     QTimer::singleShot(500, &p, &Program::run);

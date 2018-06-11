@@ -7,7 +7,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt5 COMPONENTS Core REQUIRED)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
-message(${AMQP_PROVIDER})
+add_definitions(-DAMQP_PROVIDER)
 if (NOT AMQP_PROVIDER OR ${AMQP_PROVIDER} STREQUAL RABBIT)
     add_definitions(-DRABBITMQ)
     set(AMQP_PROVIDER_SRC src/rabbitmqclient/rabbitmqclient.cpp src/rabbitmqclient/receivingqueue.cpp
