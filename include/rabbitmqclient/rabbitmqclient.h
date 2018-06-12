@@ -19,6 +19,7 @@
 
 #include <QMetaType>
 #include <QUrl>
+#include <QtDebug>
 #include <SimpleAmqpClient/SimpleAmqpClient.h>
 
 namespace RabbitMQTestClient
@@ -42,9 +43,16 @@ namespace RabbitMQTestClient
             //RabbitMQClient::connection = AmqpClient::Channel::Create(brokerUrl.host().toStdString(), 5672, brokerUrl.userName() != QStringLiteral("") ? brokerUrl.userName().toStdString() : QStringLiteral("guest").toStdString(), brokerUrl.password() != QStringLiteral("") ? brokerUrl.password().toStdString() : QStringLiteral("guest").toStdString());
         }
 
-        static inline QUrl getBrokerUrl()
-        { return brokerUrl; }
-        //static inline AmqpClient::Channel::ptr_t &getBrokerConnection() { return connection; }
+        static AmqpClient::Channel::ptr_t createConnection()
+        {
+            AmqpClient::Channel::ptr_t connection;
+            if (brokerUrl.scheme() == "ssl")
+                connection = AmqpClient::Channel::CreateSecure(std::string(), brokerUrl.host().toStdString(), std::string(), std::string(), 5671, brokerUrl.userName() != QString() ? brokerUrl.userName().toStdString() : QString("guest").toStdString(), brokerUrl.password() != QString() ? brokerUrl.password().toStdString() : QString("guest").toStdString());
+            else
+                connection = AmqpClient::Channel::Create(brokerUrl.host().toStdString(), 5672, brokerUrl.userName() != QString() ? brokerUrl.userName().toStdString() : QString("guest").toStdString(), brokerUrl.password() != QString() ? brokerUrl.password().toStdString() : QString("guest").toStdString());
+            qWarning() << "Opened" << brokerUrl.scheme() << "connection to" << brokerUrl.host();
+            return connection;
+        }
 
     private:
         static QUrl brokerUrl;

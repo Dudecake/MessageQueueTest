@@ -12,12 +12,7 @@
 RabbitMQTestClient::Topic::Topic(QString topicName, bool passive, bool durable, bool autoDelete, QObject *parent) : QObject(parent)
 {
     topic = topicName.toStdString();
-    QUrl url = RabbitMQTestClient::RabbitMQClient::getBrokerUrl();
-    if (url.scheme() == "ssl")
-        connection = AmqpClient::Channel::CreateSecure(std::string(), url.host().toStdString(), std::string(), std::string(), 5671, url.userName() != QString() ? url.userName().toStdString() : QString("guest").toStdString(), url.password() != QString() ? url.password().toStdString() : QString("guest").toStdString());
-    else
-        connection = AmqpClient::Channel::Create(url.host().toStdString(), 5672, url.userName() != QString() ? url.userName().toStdString() : QString("guest").toStdString(), url.password() != QString() ? url.password().toStdString() : QString("guest").toStdString());
-    qWarning() << "Opened" << url.scheme() << "connection to" << url.host();
+    connection = RabbitMQClient::createConnection();
     connection->DeclareExchange(topic, AmqpClient::Channel::EXCHANGE_TYPE_TOPIC, passive, durable, autoDelete);
 }
 
