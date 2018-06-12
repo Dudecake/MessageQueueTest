@@ -56,23 +56,6 @@ namespace RabbitMQTestClient
                                 bool durable = false,
                                 bool exclusive = true, bool autoDelete = true, QObject *parent = 0);
 
-        /**
-         * @brief bind binds queue to given exchange. Gets stuck more often than not, please use the constructor ReceivingQueue(Topic, QString, QString, bool, bool, bool, bool, QObject*) instead.
-         * @param topic the topic to bind the queue to
-         * @param routingKey routing key of the messages to be delivered to this queue
-         */
-        [[deprecated]]
-        void bind(Topic &topic, QString routingKey = "")
-        {
-            if (bound) return;
-            // BUG: sometimes gets stuck here, don't know why...
-            qWarning() << "Binding queue on channel" << connection.get();
-            connection->BindQueue(queue, topic.getTopic(), routingKey.toStdString());
-            qWarning() << "Bound queue" << QString::fromStdString(queue) << "to"
-                       << QString::fromStdString(topic.getTopic()) << "on channel" << connection.get();
-            bound = true;
-        }
-
         void notify();
 
         virtual ~ReceivingQueue();

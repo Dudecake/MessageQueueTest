@@ -10,9 +10,12 @@
 RabbitMQTestClient::SendingQueue::SendingQueue(QString queueName, bool passive, bool durable, bool exclusive, bool autoDelete, bool noLocal, bool noAck, bool exclusiveBind, QObject *parent) : QObject(parent)
 {
     QUrl url = RabbitMQTestClient::RabbitMQClient::getBrokerUrl();
-    connection = AmqpClient::Channel::Create(url.host().toStdString(), 5672, url.userName() != QStringLiteral("") ? url.userName().toStdString() : QStringLiteral("guest").toStdString(), url.password() != QStringLiteral("") ? url.password().toStdString() : QStringLiteral("guest").toStdString());
+    if (url.scheme() == "ssl")
+        connection = AmqpClient::Channel::CreateSecure(std::string(), url.host().toStdString(), std::string(), std::string(), 5671, url.userName() != QString() ? url.userName().toStdString() : QString("guest").toStdString(), url.password() != QString() ? url.password().toStdString() : QString("guest").toStdString());
+    else
+        connection = AmqpClient::Channel::Create(url.host().toStdString(), 5672, url.userName() != QString() ? url.userName().toStdString() : QString("guest").toStdString(), url.password() != QString() ? url.password().toStdString() : QString("guest").toStdString());
+    qWarning() << "Opened" << url.scheme() << "connection to" << url.host();
     queue = connection->DeclareQueue(queueName.toStdString(), passive, durable, exclusive, autoDelete);
-    qWarning() << "Declared queue" << QString::fromStdString(queue) << "on channel" << connection.get();
     consumerTag = connection->BasicConsume(queue, "", noLocal, noAck, exclusiveBind);
 }
 

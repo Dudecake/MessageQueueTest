@@ -20,6 +20,7 @@ void RabbitMQTestClient::ReceivingQueueWorker::notify()
     waitCon.notify_one();
 }
 
+[[noreturn]]
 void RabbitMQTestClient::ReceivingQueueWorker::run()
 {
     AmqpClient::Envelope::ptr_t response;

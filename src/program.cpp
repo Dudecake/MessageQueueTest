@@ -12,7 +12,6 @@
 #ifdef ACTIVEMQ
 #include <cms/BytesMessage.h>
 #endif
-#define CSVNAME(name, provider) name << #provider << ".csv"
 
 int64_t Program::messageCount = 1000;
 
@@ -33,7 +32,7 @@ Program::Program(QObject *parent) :
 #endif
     std::time_t startTime = std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now());
     std::stringstream ss;
-    ss << std::put_time(std::localtime(&startTime), "%F_%Y");
+    ss << '-' << std::put_time(std::localtime(&startTime), "%F_%T") << '-';
     dateString = ss.str();
     csvMessOut.set_delimiter(';', std::string());
     csvMessIn.set_delimiter(';', std::string());
@@ -60,9 +59,10 @@ void Program::run()
     }
     qDebug() << "Sent messages in" << duration<double, std::milli>(high_resolution_clock::now() - start).count() << "ns";
     std::stringstream ss;
-    ss << CSVNAME("messageOut-" + dateString, AMQP_PROVIDER);
+    ss << "messageOut" << dateString << AMQP_PROVIDER << ".csv";
     std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessOut.get_text();
+    QTimer::singleShot(2500, [&]{ QCoreApplication::exit(0); });
 }
 
 void Program::handleMessage(messageQueueProvider::Envelope envelope)
@@ -70,7 +70,18 @@ void Program::handleMessage(messageQueueProvider::Envelope envelope)
     using std::chrono::duration;
     using std::chrono::high_resolution_clock;
 
-#ifdef ACTIVEMQ
+#ifdef RABBITMQ
+    const AmqpClient::BasicMessage::ptr_t message = envelope.getMessage();
+    std::string messageBody = message->Body();
+    if (!messageBody.empty())
+    {
+        //qWarning() << "Got:" << QString::fromStdString(messageBody);
+    }
+    if (messageQueueProvider::ReceivingQueue *queue = qobject_cast<messageQueueProvider::ReceivingQueue*>(sender()))
+    {
+        queue->notify();
+    }
+#elif ACTIVEMQ
     const cms::BytesMessage *bytesMessage = dynamic_cast<const cms::BytesMessage*>(envelope.getMessage());
     if (bytesMessage != nullptr)
     {
@@ -93,7 +104,7 @@ void Program::handleMessage(messageQueueProvider::Envelope envelope)
 Program::~Program()
 {
     std::stringstream ss;
-    ss << CSVNAME("messageIn-" + dateString, AMQP_PROVIDER);
+    ss << "messageIn" << dateString << AMQP_PROVIDER << ".csv";
     std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessIn.get_text();
 }

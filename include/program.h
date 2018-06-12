@@ -6,10 +6,10 @@
 #define MESSAGEQUEUETEST_PROGRAM_H
 
 #include <QObject>
-#include <include/rabbitmqclient/receivingqueue.h>
 #include "minicsv.h"
 
 #ifdef RABBITMQ
+#include "rabbitmqclient/receivingqueue.h"
 #include "rabbitmqclient/topic.h"
 #include "rabbitmqclient/envelope.h"
 
