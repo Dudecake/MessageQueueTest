@@ -10,9 +10,9 @@ ActiveMQTestClient::ReceivingQueue::ReceivingQueue(QString queueName, QObject *p
     if( amqConnection != nullptr ) {
         amqConnection->addTransportListener( this );
     }
-    session = std::unique_ptr<cms::Session>(ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::INDIVIDUAL_ACKNOWLEDGE));
-    destination = std::unique_ptr<cms::Destination>(session->createQueue(queueName.append("?consumer.prefetchSize=1").toStdString()));
-    consumer = std::unique_ptr<cms::MessageConsumer>(session->createConsumer(destination.get()));
+    session = amqConnection->createSession(cms::Session::INDIVIDUAL_ACKNOWLEDGE);
+    destination = session->createQueue(queueName.append("?consumer.prefetchSize=1").toStdString());
+    consumer = session->createConsumer(destination);
     consumer->setMessageListener(this);
 }
 

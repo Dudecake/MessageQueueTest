@@ -6,7 +6,6 @@
 #define MESSAGEQUEUETEST_RECEIVINGQUEUE_H
 
 #include <QObject>
-#include <memory>
 #include <cms/Session.h>
 #include <cms/MessageListener.h>
 #include <cms/MessageConsumer.h>
@@ -23,9 +22,9 @@ namespace ActiveMQTestClient
         void onMessage(const cms::Message *message) override;
 
     private:
-        std::unique_ptr<cms::Session> session;
-        std::unique_ptr<cms::Destination> destination;
-        std::unique_ptr<cms::MessageConsumer> consumer;
+        cms::Session *session;
+        cms::Destination *destination;
+        cms::MessageConsumer *consumer;
 
     signals:
         void messageReceived(ActiveMQTestClient::Envelope envelope);

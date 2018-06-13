@@ -6,8 +6,6 @@
 #define MESSAGEQUEUETEST_SENDINGQUEUE_H
 
 #include <QObject>
-#include <memory>
-#include <memory>
 #include <cms/Session.h>
 #include <cms/Destination.h>
 #include <cms/MessageProducer.h>
@@ -21,9 +19,9 @@ namespace ActiveMQTestClient
         explicit SendingQueue(std::string queueName, QObject *parent);
 
     private:
-        std::unique_ptr<cms::Session> session;
-        std::unique_ptr<cms::Destination> destination;
-        std::unique_ptr<cms::MessageProducer> producer;
+        cms::Session *session;
+        cms::Destination *destination;
+        cms::MessageProducer *producer;
     public slots:
         void sendMessage(std::string messageBody);
     };

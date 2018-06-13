@@ -7,9 +7,9 @@
 
 ActiveMQTestClient::SendingQueue::SendingQueue(std::string queueName, QObject *parent) : QObject(parent)
 {
-    session = std::unique_ptr<cms::Session>(ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::AUTO_ACKNOWLEDGE));
-    destination = std::unique_ptr<cms::Destination>(session->createQueue(queueName));
-    producer = std::unique_ptr<cms::MessageProducer>(session->createProducer(destination.get()));
+    session = ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::AUTO_ACKNOWLEDGE);
+    destination = session->createQueue(queueName);
+    producer = session->createProducer(destination);
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 }
 
