@@ -54,8 +54,8 @@ int main(int argc, char *argv[])
     if (parser.isSet("u"))
         user = parser.value("u");
     QString pass = "guest";
-    if (parser.isSet("p"))
-        pass = parser.value("p");
+    if (parser.isSet("P"))
+        pass = parser.value("P");
     brokerUrl.setHost(host);
     brokerUrl.setPort(port);
     brokerUrl.setUserName(user);
