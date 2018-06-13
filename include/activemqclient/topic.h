@@ -22,11 +22,12 @@ namespace ActiveMQTestClient
         explicit Topic(QString topicName, QObject *parent = nullptr);
         explicit Topic(QString topicName, QString routingKey, QObject *parent = nullptr);
         void onMessage(const cms::Message *message) override;
+        ~Topic() = default;
 
     private:
-        std::unique_ptr<cms::Session> session;
-        std::unique_ptr<cms::Destination> destination;
-        std::unique_ptr<cms::MessageConsumer> consumer;
+        cms::Session *session;
+        cms::Destination *destination;
+        cms::MessageConsumer *consumer;
         std::unique_ptr<cms::MessageProducer> producer;
         std::string topic;
         std::string routingKey;

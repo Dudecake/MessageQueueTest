@@ -29,9 +29,8 @@ namespace ActiveMQTestClient
         {
 //            connectionFactory = std::shared_ptr<cms::ConnectionFactory>(
 //                    cms::ConnectionFactory::createCMSConnectionFactory(QString().sprintf("tcp://%s:61616?username=%s&password=&s", brokerUrl.host(), brokerUrl.userName() != QStringLiteral("") ? brokerUrl.userName() : QStringLiteral("admin"), brokerUrl.password() != QStringLiteral("") ? brokerUrl.password() : QStringLiteral("admin")).toStdString()));
-            connectionFactory = std::shared_ptr<cms::ConnectionFactory>(
-                    cms::ConnectionFactory::createCMSConnectionFactory(brokerUrl.toString(QUrl::UrlFormattingOption::None).toStdString()));
-            connection = std::shared_ptr<cms::Connection>(connectionFactory->createConnection());
+            connectionFactory = cms::ConnectionFactory::createCMSConnectionFactory(brokerUrl.toString(QUrl::UrlFormattingOption::None).toStdString());
+            connection = connectionFactory->createConnection();
             connection->start();
             connection->setExceptionListener(&client);
         }
@@ -45,13 +44,13 @@ namespace ActiveMQTestClient
 
     public:
 
-        static std::shared_ptr<cms::Connection> getConnection() { return connection; }
+        static cms::Connection *getConnection() { return connection; }
 
     private:
         ActiveMQClient() = default;
         static ActiveMQClient client;
-        static std::shared_ptr<cms::ConnectionFactory> connectionFactory;
-        static std::shared_ptr<cms::Connection> connection;
+        static cms::ConnectionFactory *connectionFactory;
+        static cms::Connection *connection;
     };
 }
 

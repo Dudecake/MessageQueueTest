@@ -6,7 +6,7 @@
 
 ActiveMQTestClient::ReceivingQueue::ReceivingQueue(QString queueName, QObject *parent) : QObject(parent)
 {
-    activemq::core::ActiveMQConnection* amqConnection = dynamic_cast<activemq::core::ActiveMQConnection*>(ActiveMQTestClient::ActiveMQClient::getConnection().get());
+    activemq::core::ActiveMQConnection* amqConnection = dynamic_cast<activemq::core::ActiveMQConnection*>(ActiveMQTestClient::ActiveMQClient::getConnection());
     if( amqConnection != nullptr ) {
         amqConnection->addTransportListener( this );
     }

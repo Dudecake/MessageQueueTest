@@ -5,12 +5,12 @@
 #include "activemqclient/activemqclient.h"
 #include <activemq/commands/ActiveMQBytesMessage.h>
 
-ActiveMQTestClient::Topic::Topic(QString topicName, QObject *parent) : QObject(parent)
+ActiveMQTestClient::Topic::Topic(QString topicName, QObject *parent) : QObject(parent), consumer(nullptr)
 {
     this->topic = topicName.toStdString();
-    session = std::unique_ptr<cms::Session>(ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::INDIVIDUAL_ACKNOWLEDGE));
-    destination = std::unique_ptr<cms::Destination>(session->createTopic(topicName.append("?consumer.prefetchSize=1").toStdString()));
-    producer = std::unique_ptr<cms::MessageProducer>(session->createProducer(destination.get()));
+    session = ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::INDIVIDUAL_ACKNOWLEDGE);
+    destination = session->createTopic(topicName.append("?consumer.prefetchSize=1").toStdString());
+    producer = std::unique_ptr<cms::MessageProducer>(session->createProducer(destination));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 }
 
@@ -18,16 +18,16 @@ ActiveMQTestClient::Topic::Topic(QString topicName, QString routingKey, QObject 
 {
     this->topic = topicName.toStdString();
     this->routingKey = routingKey.toStdString();
-    activemq::core::ActiveMQConnection* amqConnection = dynamic_cast<activemq::core::ActiveMQConnection*>(ActiveMQTestClient::ActiveMQClient::getConnection().get());
+    activemq::core::ActiveMQConnection* amqConnection = dynamic_cast<activemq::core::ActiveMQConnection*>(ActiveMQTestClient::ActiveMQClient::getConnection());
     if( amqConnection != nullptr ) {
         amqConnection->addTransportListener( this );
     }
-    session = std::unique_ptr<cms::Session>(ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::INDIVIDUAL_ACKNOWLEDGE));
-    destination = std::unique_ptr<cms::Destination>(session->createTopic(topicName.append("?consumer.prefetchSize=1").toStdString()));
+    session = ActiveMQTestClient::ActiveMQClient::getConnection()->createSession(cms::Session::INDIVIDUAL_ACKNOWLEDGE);
+    destination = session->createTopic(topicName.append("?consumer.prefetchSize=1").toStdString());
     if (!routingKey.isEmpty())
-        consumer = std::unique_ptr<cms::MessageConsumer>(session->createConsumer(destination.get(), QString("routingKey='%1'").arg(routingKey).toStdString()));
+        consumer = session->createConsumer(destination, QString("routingKey='%1'").arg(routingKey).toStdString());
     else
-        consumer = std::unique_ptr<cms::MessageConsumer>(session->createConsumer(destination.get()));
+        consumer = session->createConsumer(destination);
     consumer->setMessageListener(this);
 }
 

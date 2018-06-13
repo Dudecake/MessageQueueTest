@@ -77,9 +77,7 @@ int main(int argc, char *argv[])
     QString urlString;
     QTextStream ts(&urlString);
     ts << "username=" << user << "&password=" << pass;
-    qWarning() << brokerUrl << urlString;
     brokerUrl.setQuery(urlString);
-    qWarning() << brokerUrl;
     ActiveMQTestClient::ActiveMQClient::initClient(brokerUrl);
 #elif KAFKA
     int port = 9092;
