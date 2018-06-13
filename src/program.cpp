@@ -2,6 +2,7 @@
 // Created by dudecake on 30/12/17.
 //
 #include <QtDebug>
+#include <QTimer>
 #include <QCoreApplication>
 #include <thread>
 #include <ostream>

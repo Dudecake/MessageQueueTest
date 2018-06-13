@@ -2,6 +2,7 @@
 #include <QCommandLineParser>
 #include <QUrlQuery>
 #ifdef ACTIVEMQ
+#include <QTextStream>
 #include <activemq/library/ActiveMQCPP.h>
 #include "activemqclient/activemqclient.h"
 #elif RABBITMQ
@@ -63,7 +64,7 @@ int main(int argc, char *argv[])
 #elif ACTIVEMQ
     int port = 61616;
     if (parser.isSet("port"))
-        port = parser.value("port").toInt());
+        port = parser.value("port").toInt();
     QString user = "admin";
     if (parser.isSet("user"))
         user = parser.value("user");
@@ -73,10 +74,10 @@ int main(int argc, char *argv[])
     activemq::library::ActiveMQCPP::initializeLibrary();
     brokerUrl.setHost(host);
     brokerUrl.setPort(port);
-    std::stringstream ss;
-    ss << "username=" << user << "&password=" << pass;
-    brokerUrl.setScheme(ss.str());
-    ss.str(std::string());
+    QString urlString;
+    QTextStream ts(&urlString);
+    ts << "username=" << user << "&password=" << pass;
+    brokerUrl.setScheme(urlString);
     ActiveMQTestClient::ActiveMQClient::initClient(brokerUrl);
 #elif KAFKA
     int port = 9092;
