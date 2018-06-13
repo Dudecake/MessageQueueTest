@@ -63,14 +63,14 @@ int main(int argc, char *argv[])
     RabbitMQTestClient::RabbitMQClient::initClient(brokerUrl);
 #elif ACTIVEMQ
     int port = 61616;
-    if (parser.isSet("port"))
-        port = parser.value("port").toInt();
+    if (parser.isSet("p"))
+        port = parser.value("p").toInt();
     QString user = "admin";
-    if (parser.isSet("user"))
-        user = parser.value("user");
+    if (parser.isSet("u"))
+        user = parser.value("u");
     QString pass = "admin";
-    if (parser.isSet("pass"))
-        pass = parser.value("pass");
+    if (parser.isSet("P"))
+        pass = parser.value("P");
     activemq::library::ActiveMQCPP::initializeLibrary();
     brokerUrl.setHost(host);
     brokerUrl.setPort(port);
@@ -81,14 +81,14 @@ int main(int argc, char *argv[])
     ActiveMQTestClient::ActiveMQClient::initClient(brokerUrl);
 #elif KAFKA
     int port = 9092;
-    if (parser.isSet("port"))
-        port = parser.value("port").toInt();
+    if (parser.isSet("p"))
+        port = parser.value("p").toInt();
     QString user = "guest";
-    if (parser.isSet("user"))
-        user = parser.value("user");
+    if (parser.isSet("u"))
+        user = parser.value("u");
     QString pass = "guest";
-    if (parser.isSet("pass"))
-        pass = parser.value("pass");
+    if (parser.isSet("P"))
+        pass = parser.value("P");
     brokerUrl.setHost(host);
     brokerUrl.setPort(port);
     KafkaTestClient::KafkaClient::initClient(brokerUrl);
