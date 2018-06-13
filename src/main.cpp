@@ -94,9 +94,10 @@ int main(int argc, char *argv[])
     KafkaTestClient::KafkaClient::initClient(brokerUrl);
 #endif
 
-    Program p;
-    QTimer::singleShot(500, &p, &Program::run);
+    Program *p = new Program();
+    QTimer::singleShot(500, p, &Program::run);
     int res = a.exec();
+    delete p;
 
 #ifdef ACTIVEMQ
     activemq::library::ActiveMQCPP::shutdownLibrary();

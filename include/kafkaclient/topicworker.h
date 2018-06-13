@@ -20,6 +20,7 @@ namespace KafkaTestClient
     public:
         explicit TopicWorker(std::shared_ptr<RdKafka::KafkaConsumer> consumer, std::shared_ptr<RdKafka::Topic> topic, int32_t partition = 0, QObject *parent = nullptr);
         void notify();
+        ~TopicWorker() = default;
 
     protected:
         [[noreturn]]

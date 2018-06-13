@@ -28,7 +28,7 @@ namespace KafkaTestClient
         std::shared_ptr<RdKafka::KafkaConsumer> consumer;
         std::shared_ptr<RdKafka::Producer> producer;
         std::shared_ptr<RdKafka::Topic> internalTopic;
-        std::unique_ptr<KafkaTestClient::TopicWorker> worker;
+        KafkaTestClient::TopicWorker *worker;
         int32_t partition;
 
     public slots:

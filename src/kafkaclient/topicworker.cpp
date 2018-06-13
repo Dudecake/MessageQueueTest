@@ -22,7 +22,7 @@ void KafkaTestClient::TopicWorker::run()
     qDebug() << "Started listening for messages";
     while (true)
     {
-        RdKafka::Message *message = consumer->consume(-1);
+        RdKafka::Message *message = consumer->consume(50);
         if (message->err() == RdKafka::ERR_NO_ERROR)
         {
             emit messageReceived(Envelope(message));
@@ -31,8 +31,14 @@ void KafkaTestClient::TopicWorker::run()
                 mutex.lock();
                 waitCon.wait(&mutex);
                 mutex.unlock();
+                if (this->isInterruptionRequested())
+                    return;
             }
             handled = false;
+        }
+        else if (this->isInterruptionRequested())
+        {
+            return;
         }
         else
         {

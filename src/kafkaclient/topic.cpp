@@ -8,7 +8,7 @@
 
 int KafkaTestClient::Topic::groupCounter = 0;
 
-KafkaTestClient::Topic::Topic(std::string topicName, QObject *parent) : QObject(parent)
+KafkaTestClient::Topic::Topic(std::string topicName, QObject *parent) : QObject(parent), worker(nullptr)
 {
     std::string errString;
     std::shared_ptr<RdKafka::Conf> conf = KafkaClient::getConf();
@@ -40,7 +40,7 @@ KafkaTestClient::Topic::Topic(std::string topicName, QObject *parent) : QObject(
 //    worker->start();
 }
 
-KafkaTestClient::Topic::Topic(std::string topicName, std::string routingKey, QObject *parent) : QObject(parent)
+KafkaTestClient::Topic::Topic(std::string topicName, std::string routingKey, QObject *parent) : QObject(parent), worker(nullptr)
 {
     std::string errString;
     std::shared_ptr<RdKafka::Conf> conf = KafkaClient::getConf();
@@ -70,8 +70,8 @@ KafkaTestClient::Topic::Topic(std::string topicName, std::string routingKey, QOb
         qWarning() << "Failed to subscribe to" << QString::fromStdString(topicName) << QString::fromStdString(RdKafka::err2str(errorCode));
     }
     qDebug() << "Subscribed to" << QString::fromStdString(topicName);
-    worker = std::unique_ptr<TopicWorker>(new TopicWorker(consumer, internalTopic, std::stoi(routingKey), this));//new ReceivingQueueWorker(connection, queue, consumerTag);
-    connect(worker.get(), &TopicWorker::messageReceived, [this](KafkaTestClient::Envelope envelope){
+    worker = new TopicWorker(consumer, internalTopic, std::stoi(routingKey), this);//new ReceivingQueueWorker(connection, queue, consumerTag);
+    connect(worker, &TopicWorker::messageReceived, [this](KafkaTestClient::Envelope envelope){
         emit messageReceived(envelope);
     });
     worker->start();
@@ -90,6 +90,12 @@ void KafkaTestClient::Topic::sendMessage(std::string messageBody, std::string ro
 
 KafkaTestClient::Topic::~Topic()
 {
-    if (consumer)
-        consumer->close();
+//    if (consumer)
+//        consumer->close();
+    if (worker)
+    {
+        worker->requestInterruption();
+        worker->notify();
+        worker->wait();
+    }
 }
