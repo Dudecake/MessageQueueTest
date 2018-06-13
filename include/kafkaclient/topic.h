@@ -18,6 +18,8 @@ namespace KafkaTestClient
     {
         Q_OBJECT
     public:
+        static void restoreGroupCounter(int groupCounter) { if (Topic::groupCounter == 0) Topic::groupCounter = groupCounter; }
+        static int getGroupCounter() { return groupCounter; }
         explicit Topic(std::string topicName, QObject *parent = nullptr);
         explicit Topic(std::string topicName, std::string routingKey = std::string(), QObject *parent = nullptr);
         void inline notify() { if (worker) worker->notify(); }

@@ -70,7 +70,7 @@ KafkaTestClient::Topic::Topic(std::string topicName, std::string routingKey, QOb
         qWarning() << "Failed to subscribe to" << QString::fromStdString(topicName) << QString::fromStdString(RdKafka::err2str(errorCode));
     }
     qDebug() << "Subscribed to" << QString::fromStdString(topicName);
-    worker = new TopicWorker(consumer, internalTopic, std::stoi(routingKey), this);//new ReceivingQueueWorker(connection, queue, consumerTag);
+    worker = new TopicWorker(consumer, internalTopic, std::stoi(routingKey), this);
     connect(worker, &TopicWorker::messageReceived, [this](KafkaTestClient::Envelope envelope){
         emit messageReceived(envelope);
     });

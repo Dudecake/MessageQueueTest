@@ -6,6 +6,7 @@
 #define MESSAGEQUEUETEST_PROGRAM_H
 
 #include <QObject>
+#include <QStandardPaths>
 #include "minicsv.h"
 
 #ifdef RABBITMQ
@@ -41,6 +42,7 @@ private:
     mini::csv::ostringstream csvMessIn;
     std::chrono::time_point<std::chrono::high_resolution_clock> inMessInterval;
     int64_t inMessId;
+    std::string dataDir;
     std::string dateString;
 public slots:
     void run();

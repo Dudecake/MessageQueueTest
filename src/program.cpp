@@ -3,9 +3,12 @@
 //
 #include <QtDebug>
 #include <QTimer>
+#include <QDir>
+#include <QFile>
 #include <QCoreApplication>
 #include <thread>
 #include <ostream>
+#include <filesystem>
 #include <ctime>
 #include <iomanip>
 #include "program.h"
@@ -39,6 +42,19 @@ Program::Program(QObject *parent) :
     csvMessIn.set_delimiter(';', std::string());
     csvMessOut << "messId" << "sendTime (ms)" << NEWLINE;
     csvMessIn << "messId" << "recvTime (ms)" << NEWLINE;
+    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/ImageDownloader/";
+    QDir data(QString::fromStdString(dataDir));
+    if (!data.exists())
+        data.mkpath(".");
+    ss.str(std::string());
+    ss << dataDir << "groupCounter";
+    QFile counterFile(QString::fromStdString(ss.str()));
+    if (counterFile.exists())
+    {
+        int counter = 0;
+        QTextStream(&counterFile) >> counter;
+        KafkaTestClient::Topic::restoreGroupCounter(counter);
+    }
 }
 
 void Program::run()
@@ -60,7 +76,7 @@ void Program::run()
     }
     qDebug() << "Sent messages in" << duration<double, std::milli>(high_resolution_clock::now() - start).count() << "ns";
     std::stringstream ss;
-    ss << "messageOut" << dateString << AMQP_PROVIDER << ".csv";
+    ss << dataDir << "messageOut" << dateString << AMQP_PROVIDER << ".csv";
     std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessOut.get_text();
     QTimer::singleShot(2500, [&]{ QCoreApplication::exit(0); });
@@ -104,8 +120,15 @@ void Program::handleMessage(messageQueueProvider::Envelope envelope)
 
 Program::~Program()
 {
+#ifdef KAFKA
+
+#endif
     std::stringstream ss;
-    ss << "messageIn" << dateString << AMQP_PROVIDER << ".csv";
+    ss << dataDir << "messageIn" << dateString << AMQP_PROVIDER << ".csv";
     std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessIn.get_text();
+    ss.str(std::string());
+    ss << dataDir << "groupCounter";
+    std::ofstream counterFile(ss.str(), std::ios_base::trunc);
+    counterFile << KafkaTestClient::Topic::getGroupCounter();
 }
