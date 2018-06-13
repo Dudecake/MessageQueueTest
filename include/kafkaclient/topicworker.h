@@ -23,7 +23,6 @@ namespace KafkaTestClient
         ~TopicWorker() = default;
 
     protected:
-        [[noreturn]]
         virtual void run() override;
 
     private:
