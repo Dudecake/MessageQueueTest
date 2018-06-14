@@ -19,8 +19,9 @@
 
 int64_t Program::messageCount = 1000;
 
-Program::Program(QObject *parent) :
+Program::Program(std::string dataDir, QObject *parent) :
         QObject(parent),
+        dataDir(dataDir),
 #ifdef RABBITMQ
         r("foo.test", false, false, true, this),
         queue(r, QString(), "0", false, false, true, true, this),
@@ -42,21 +43,6 @@ Program::Program(QObject *parent) :
     csvMessIn.set_delimiter(';', std::string());
     csvMessOut << "messId" << "sendTime (ms)" << NEWLINE;
     csvMessIn << "messId" << "recvTime (ms)" << NEWLINE;
-    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + '/';
-    QDir data(QString::fromStdString(dataDir));
-    if (!data.exists())
-        data.mkpath(".");
-#ifdef KAFKA
-    ss.str(std::string());
-    ss << dataDir << "groupCounter";
-    if (QFile(QString::fromStdString(ss.str())).exists())
-    {
-        int counter = 0;
-        std::ifstream counterStream(ss.str(), std::ios_base::in);
-        counterStream >> counter;
-        KafkaTestClient::Topic::restoreGroupCounter(counter);
-    }
-#endif
 }
 
 void Program::run()

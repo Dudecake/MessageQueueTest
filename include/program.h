@@ -29,7 +29,7 @@ class Program : public QObject
 {
     Q_OBJECT
 public:
-    explicit Program(QObject *parent = nullptr);
+    explicit Program(std::string dataDir, QObject *parent = nullptr);
     virtual ~Program();
 
 private:

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <QDir>
 #include <QCommandLineParser>
 #include <QUrlQuery>
 #ifdef ACTIVEMQ
@@ -94,7 +95,24 @@ int main(int argc, char *argv[])
     KafkaTestClient::KafkaClient::initClient(brokerUrl);
 #endif
 
-    Program *p = new Program();
+    std::string dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + '/';
+    QDir data(QString::fromStdString(dataDir));
+    if (!data.exists())
+        data.mkpath(".");
+#ifdef KAFKA
+    std::stringstream ss;
+    ss << dataDir << "groupCounter";
+    if (QFile(QString::fromStdString(ss.str())).exists())
+    {
+        int counter = 0;
+        std::ifstream counterStream(ss.str(), std::ios_base::in);
+        counterStream >> counter;
+        KafkaTestClient::Topic::restoreGroupCounter(counter);
+    }
+#endif
+
+
+    Program *p = new Program(dataDir);
     QTimer::singleShot(500, p, &Program::run);
     int res = a.exec();
     delete p;
