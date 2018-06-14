@@ -20,7 +20,7 @@ void KafkaTestClient::ReceivingQueueWorker::run()
 {
     while (true)
     {
-        RdKafka::Message *message = consumer->consume(queue.get(), -1);
+        RdKafka::Message *message = consumer->consume(queue.get(), 50);
         if (message->err() == RdKafka::ERR_NO_ERROR)
         {
             emit messageReceived(Envelope(message));
