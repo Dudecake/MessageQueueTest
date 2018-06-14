@@ -116,6 +116,6 @@ Program::~Program()
     ss.str(std::string());
     ss << dataDir << "groupCounter";
     std::ofstream counterFile(ss.str(), std::ios_base::trunc);
-    counterFile << KafkaTestClient::Topic::getGroupCounter();
+    counterFile << (KafkaTestClient::Topic::getGroupCounter() + 1);
 #endif
 }
