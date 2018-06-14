@@ -42,19 +42,21 @@ Program::Program(QObject *parent) :
     csvMessIn.set_delimiter(';', std::string());
     csvMessOut << "messId" << "sendTime (ms)" << NEWLINE;
     csvMessIn << "messId" << "recvTime (ms)" << NEWLINE;
-    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/ImageDownloader/";
+    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + '/';
     QDir data(QString::fromStdString(dataDir));
     if (!data.exists())
         data.mkpath(".");
+#ifdef KAFKA
     ss.str(std::string());
     ss << dataDir << "groupCounter";
-    QFile counterFile(QString::fromStdString(ss.str()));
-    if (counterFile.exists())
+    if (QFile(QString::fromStdString(ss.str())).exists())
     {
         int counter = 0;
-        QTextStream(&counterFile) >> counter;
+        std::ifstream counterStream(ss.str(), std::ios_base::in);
+        counterStream >> counter;
         KafkaTestClient::Topic::restoreGroupCounter(counter);
     }
+#endif
 }
 
 void Program::run()
@@ -120,15 +122,14 @@ void Program::handleMessage(messageQueueProvider::Envelope envelope)
 
 Program::~Program()
 {
-#ifdef KAFKA
-
-#endif
     std::stringstream ss;
     ss << dataDir << "messageIn" << dateString << AMQP_PROVIDER << ".csv";
     std::ofstream csvFile(ss.str(), std::ios_base::trunc);
     csvFile << csvMessIn.get_text();
+#ifdef KAFKA
     ss.str(std::string());
     ss << dataDir << "groupCounter";
     std::ofstream counterFile(ss.str(), std::ios_base::trunc);
     counterFile << KafkaTestClient::Topic::getGroupCounter();
+#endif
 }
