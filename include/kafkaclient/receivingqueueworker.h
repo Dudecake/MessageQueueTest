@@ -22,7 +22,6 @@ namespace KafkaTestClient
         void notify();
 
     protected:
-        [[noreturn]]
         virtual void run() override;
 
     private:

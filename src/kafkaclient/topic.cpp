@@ -33,11 +33,6 @@ KafkaTestClient::Topic::Topic(std::string topicName, QObject *parent) : QObject(
         return;
     }
     producer->poll(0);
-//    worker = std::unique_ptr<TopicWorker>(new TopicWorker(consumer, internalTopic, 0, this));//new ReceivingQueueWorker(connection, queue, consumerTag);
-//    connect(worker.get(), &TopicWorker::messageReceived, [this](KafkaTestClient::Envelope envelope){
-//        emit messageReceived(envelope);
-//    });
-//    worker->start();
 }
 
 KafkaTestClient::Topic::Topic(std::string topicName, std::string routingKey, QObject *parent) : QObject(parent), worker(nullptr)
@@ -57,13 +52,6 @@ KafkaTestClient::Topic::Topic(std::string topicName, std::string routingKey, QOb
         QCoreApplication::exit(1);
         return;
     }
-//    internalTopic = std::shared_ptr<RdKafka::Topic>(RdKafka::Topic::create(consumer.get(), topicName, KafkaClient::getTopicConf().get(), errString));
-//    if (!internalTopic)
-//    {
-//        qWarning() << "Failed to create topic:" << QString::fromStdString(errString);
-//        QCoreApplication::exit(1);
-//        return;
-//    }
     RdKafka::ErrorCode errorCode = consumer->subscribe({ topicName });
     if (errorCode)
     {
@@ -90,8 +78,6 @@ void KafkaTestClient::Topic::sendMessage(std::string messageBody, std::string ro
 
 KafkaTestClient::Topic::~Topic()
 {
-//    if (consumer)
-//        consumer->close();
     if (worker)
     {
         worker->requestInterruption();

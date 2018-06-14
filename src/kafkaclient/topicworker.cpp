@@ -31,18 +31,16 @@ void KafkaTestClient::TopicWorker::run()
                 mutex.lock();
                 waitCon.wait(&mutex);
                 mutex.unlock();
-                if (this->isInterruptionRequested())
-                    return;
             }
             handled = false;
-        }
-        else if (this->isInterruptionRequested())
-        {
-            return;
         }
         else
         {
             delete message;
+        }
+        if (this->isInterruptionRequested())
+        {
+            break;
         }
     }
 }

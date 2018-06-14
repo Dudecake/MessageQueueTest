@@ -36,5 +36,9 @@ void KafkaTestClient::ReceivingQueueWorker::run()
         {
             delete message;
         }
+        if (this->isInterruptionRequested())
+        {
+            break;
+        }
     }
 }
